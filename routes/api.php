@@ -24,3 +24,6 @@ Route::get('todo-list', [TodoListController::class, 'index'])
 
 Route::get('todo-list/{todo_list}', [TodoListController::class, 'show'])
     ->name('todo-list.show');
+
+Route::post('todo-list', [TodoListController::class, 'store'])
+    ->name('todo-list.store');

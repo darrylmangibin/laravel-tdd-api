@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
 class TodoListTest extends TestCase
@@ -42,5 +43,20 @@ class TodoListTest extends TestCase
             ->json();
 
         $this->assertEquals($response['name'], $this->list->name);
+    }
+
+    public function test_store_todo_list()
+    {
+        $todo_list = TodoList::factory()->make();
+
+        $response = $this->postJson(route('todo-list.store'), [
+            'name' => $todo_list->name
+        ]);
+
+        $response->assertStatus(Response::HTTP_CREATED);
+        $this->assertDatabaseHas('todo_lists', [
+            'name' => $response->json()['name']
+        ]);
+        $this->assertEquals($todo_list->name, $response->json()['name']);
     }
 }
