@@ -59,4 +59,17 @@ class TodoListTest extends TestCase
         ]);
         $this->assertEquals($todo_list->name, $response->json()['name']);
     }
+
+    public function test_todo_list_validation()
+    {
+        $this->withExceptionHandling();
+
+        $response = $this->postJson(route('todo-list.store'))
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+
+        $response->assertJsonValidationErrors('name');
+        $this->assertArrayHasKey('errors', $response->json());
+        $this->assertArrayHasKey('name', $response->json()['errors']);
+    }
 }
