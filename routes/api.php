@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TasksChangeStatusController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TodoListController;
 use Illuminate\Http\Request;
@@ -39,3 +40,5 @@ Route::apiResource('todo-list', TodoListController::class);
 
 Route::apiResource('todo-list.task', TasksController::class)
     ->shallow();
+
+Route::patch('task/{task}/change-status', [TasksChangeStatusController::class, 'changeStatus'])->name('task.change_status.update');

@@ -13,7 +13,7 @@ class TodoListController extends Controller
 {
     public function index()
     {
-        $list = TodoList::all();
+        $list = TodoList::with('tasks')->get();
 
         return response($list);
     }
