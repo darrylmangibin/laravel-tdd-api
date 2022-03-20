@@ -20,8 +20,8 @@ class TodoListTest extends TestCase
     {
         parent::setUp();
 
-        $this->authUser();
-        $this->list = $this->createTodoLists();
+        $user = $this->authUser();
+        $this->list = $this->createTodoLists(['user_id' => $user->id]);
 
     }
 
@@ -33,9 +33,11 @@ class TodoListTest extends TestCase
      */
     public function test_index_todo_list()
     {
+        $this->createTodoLists();
+
         $response = $this->getJson(route('todo-list.index'));
 
-        $this->assertEquals($this->list->count(), count($response->json()));
+        $this->assertEquals(1, count($response->json()));
         $this->assertEquals($this->list->name, $response->json()[0]['name']);
     }
 
@@ -53,7 +55,7 @@ class TodoListTest extends TestCase
         $todo_list = TodoList::factory()->make();
 
         $response = $this->postJson(route('todo-list.store'), [
-            'name' => $todo_list->name
+            'name' => $todo_list->name,
         ]);
 
         $response->assertStatus(Response::HTTP_CREATED);

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Task;
+use App\Models\TodoList;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,16 +15,18 @@ class TaskTest extends TestCase
 
     private $tasks;
 
+    private $user;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->authUser();
+        $this->user = $this->authUser();
     }
 
     public function test_fetch_all_tasks_of_a_todo_list()
     {
-        $list = $this->createTodoLists();
+        $list = $this->createTodoLists(['user_id' => $this->user->id]);
         $task = $this->createTasks(['todo_list_id' => $list->id]);
 
         $response = $this->getJson(route('todo-list.task.index', $list->id))->assertOk()->json();
@@ -35,8 +38,8 @@ class TaskTest extends TestCase
 
     public function test_store_task_for_a_todo_list(Type $var = null)
     {
-        $list = $this->createTodoLists();
-        $task = Task::factory()->make([]);
+        $list = $this->createTodoLists(['user_id' => $this->user->id]);
+        $task = Task::factory()->make();
 
         $response = $this->postJson(route('todo-list.task.store', $list->id), [
             'title' => $task->title,
@@ -52,7 +55,7 @@ class TaskTest extends TestCase
     public function test_store_task_validation()
     {
         $this->withExceptionHandling();
-        $list = $this->createTodoLists();
+        $list = $this->createTodoLists(['user_id' => $this->user->id]);
 
         $response = $this->postJson(route('todo-list.task.store', $list->id));
 
