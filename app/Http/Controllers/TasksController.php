@@ -14,7 +14,7 @@ class TasksController extends Controller
 {
     public function index(TodoList $todo_list)
     {
-        $tasks = Task::where(['todo_list_id' => $todo_list->id])->get();
+        $tasks = $todo_list->tasks;
 
         return response($tasks, Response::HTTP_OK);
     }
@@ -23,9 +23,7 @@ class TasksController extends Controller
     {
         try {
             return DB::transaction(function () use ($request, $todo_list) {
-                $request['todo_list_id'] = $todo_list->id;
-
-                $task = Task::create($request->all());
+                $task = $todo_list->tasks()->create($request->all());
 
                 return response($task, Response::HTTP_CREATED);
             });
