@@ -12,6 +12,12 @@ class TaskCompletedTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function setUp(): void {
+        parent:: setUp();
+
+        $this->authUser();
+    }
+
     public function test_task_can_be_change_status()
     {
         $task = $this->createTasks();

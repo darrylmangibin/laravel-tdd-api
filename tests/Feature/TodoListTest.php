@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\TodoList;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Laravel\Sanctum\Sanctum;
 use Symfony\Component\HttpFoundation\Response;
 use Tests\TestCase;
 
@@ -18,7 +20,9 @@ class TodoListTest extends TestCase
     {
         parent::setUp();
 
+        $this->authUser();
         $this->list = $this->createTodoLists();
+
     }
 
 
@@ -29,7 +33,6 @@ class TodoListTest extends TestCase
      */
     public function test_index_todo_list()
     {
-
         $response = $this->getJson(route('todo-list.index'));
 
         $this->assertEquals($this->list->count(), count($response->json()));

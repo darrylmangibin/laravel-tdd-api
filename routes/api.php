@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\TasksChangeStatusController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\TodoListController;
@@ -36,9 +38,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::patch('todo-list/{todo_list}', [TodoListController::class, 'update'])
 //     ->name('todo-list.update');
 
-Route::apiResource('todo-list', TodoListController::class);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('todo-list', TodoListController::class);
 
-Route::apiResource('todo-list.task', TasksController::class)
-    ->shallow();
+    Route::apiResource('todo-list.task', TasksController::class)
+        ->shallow();
 
-Route::patch('task/{task}/change-status', [TasksChangeStatusController::class, 'changeStatus'])->name('task.change_status.update');
+    Route::patch('task/{task}/change-status', [TasksChangeStatusController::class, 'changeStatus'])->name('task.change_status.update');
+});
+
+
+Route::post('/register', RegisterController::class)->name('user.register');
+Route::post('/login', LoginController::class)->name('user.login');
