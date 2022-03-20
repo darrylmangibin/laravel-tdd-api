@@ -13,12 +13,14 @@
         "laravel/tinker": "^2.5"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.12",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^5.10",
-        "phpunit/phpunit": "^9.5.10"
+        "phpunit/phpunit": "^9.5.10",
+        "spatie/phpunit-watcher": "^1.23"
     },
     "autoload": {
         "psr-4": {
@@ -47,16 +49,18 @@
             "@php artisan key:generate --ansi"
         ]
     },
-    "extra": {
-        "laravel": {
-            "dont-discover": []
-        }
-    },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+          "dont-discover": [
+            "barryvdh/laravel-ide-helper"
+          ]
+        }
+      }
 }
