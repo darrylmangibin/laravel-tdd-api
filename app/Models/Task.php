@@ -10,6 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title'
+        'title',
+        'todo_list_id'
     ];
 }

@@ -17,28 +17,33 @@ class TaskTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->tasks = $this->createTasks();
     }
 
     public function test_fetch_all_tasks_of_a_todo_list()
     {
         $list = $this->createTodoLists();
+        $task = $this->createTasks(['todo_list_id' => $list->id]);
+        $this->createTasks(['todo_list_id' => 2]);
+
         $response = $this->getJson(route('todo-list.task.index', $list->id))->assertOk()->json();
 
-        $this->assertEquals($this->tasks->title, $response[0]['title']);
+        $this->assertEquals(1, count($response));
+        $this->assertEquals($task->title, $response[0]['title']);
+        $this->assertEquals($task->todo_list_id, $response[0]['todo_list_id']);
     }
 
     public function test_store_task_for_a_todo_list(Type $var = null)
     {
-        $task = Task::factory()->make();
         $list = $this->createTodoLists();
+        $task = Task::factory()->make([]);
+
         $response = $this->postJson(route('todo-list.task.store', $list->id), [
-            'title' => $task->title
+            'title' => $task->title,
         ]);
 
         $this->assertDatabaseHas('tasks', [
-            'title' => $task->title
+            'title' => $task->title,
+            'todo_list_id' => $list->id
         ]);
         $response->assertStatus(Response::HTTP_CREATED);
     }
@@ -57,12 +62,13 @@ class TaskTest extends TestCase
     public function test_delete_task_from_database()
     {
         $this->withExceptionHandling();
+        $task = $this->createTasks();
 
-        $response = $this->deleteJson(route('task.destroy', $this->tasks->id));
+        $response = $this->deleteJson(route('task.destroy', $task->id));
 
         $response->assertStatus(Response::HTTP_OK);
         $this->assertDatabaseMissing('tasks', [
-            'id' => $this->tasks->id,
+            'id' => $task->id,
         ]);
     }
 
@@ -70,22 +76,25 @@ class TaskTest extends TestCase
     {
         $this->withExceptionHandling();
         $invalid_id = 194;
+        $task = $this->createTasks();
 
         $response = $this->deleteJson(route('task.destroy', $invalid_id));
 
-        $this->assertDatabaseCount('tasks', $this->tasks->count());
+        $this->assertDatabaseCount('tasks', $task->count());
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
     public function test_update_task_for_a_todo()
     {
-        $response = $this->patchJson(route('task.update', $this->tasks->id), [
+        $task = $this->createTasks();
+
+        $response = $this->patchJson(route('task.update', $task->id), [
             'title' => 'Updated'
         ]);
 
         $response->assertStatus(Response::HTTP_OK);
         $this->assertDatabaseHas('tasks', [
-            'id' => $this->tasks->id,
+            'id' => $task->id,
             'title' => 'Updated'
         ]);
     }
@@ -93,8 +102,9 @@ class TaskTest extends TestCase
     public function test_update_task_invalid_request()
     {
         $this->withExceptionHandling();
+        $task = $this->createTasks();
 
-        $response = $this->patchJson(route('task.update', $this->tasks->id));
+        $response = $this->patchJson(route('task.update', $task->id));
 
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertArrayHasKey('errors', $response->json());

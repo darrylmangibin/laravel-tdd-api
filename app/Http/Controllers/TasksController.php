@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TaskRequest;
 use App\Models\Task;
+use App\Models\TodoList;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,17 +12,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TasksController extends Controller
 {
-    public function index()
+    public function index(TodoList $todo_list)
     {
-        $tasks = Task::all();
+        $tasks = Task::where(['todo_list_id' => $todo_list->id])->get();
 
         return response($tasks, Response::HTTP_OK);
     }
 
-    public function store(TaskRequest $request)
+    public function store(TaskRequest $request, TodoList $todo_list)
     {
         try {
-            return DB::transaction(function () use ($request) {
+            return DB::transaction(function () use ($request, $todo_list) {
+                $request['todo_list_id'] = $todo_list->id;
+
                 $task = Task::create($request->all());
 
                 return response($task, Response::HTTP_CREATED);
