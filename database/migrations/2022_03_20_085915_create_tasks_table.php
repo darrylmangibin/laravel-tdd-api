@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddNameInTodoListsTable extends Migration
+class CreateTasksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddNameInTodoListsTable extends Migration
      */
     public function up()
     {
-        Schema::table('todo_lists', function (Blueprint $table) {
-            $table->string('name');
+        Schema::create('tasks', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +27,6 @@ class AddNameInTodoListsTable extends Migration
      */
     public function down()
     {
-        Schema::table('todo_lists', function (Blueprint $table) {
-            $table->dropColumn('name');
-        });
+        Schema::dropIfExists('tasks');
     }
 }
