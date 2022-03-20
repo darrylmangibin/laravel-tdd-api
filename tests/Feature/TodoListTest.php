@@ -72,4 +72,51 @@ class TodoListTest extends TestCase
         $this->assertArrayHasKey('errors', $response->json());
         $this->assertArrayHasKey('name', $response->json()['errors']);
     }
+
+    public function test_delete_todo_list()
+    {
+        $response = $this->deleteJson(route('todo-list.destroy', $this->list->id));
+
+        $this->assertDatabaseMissing('todo_lists', ['id' => $this->list->id]);
+        $response->assertStatus(Response::HTTP_OK);
+    }
+
+    public function test_delete_todo_list_invalid_id()
+    {
+        $this->withExceptionHandling();
+        $invalid_id = 941;
+
+        $response = $this->deleteJson(route('todo-list.destroy', $invalid_id));
+
+        $todo_list_count = TodoList::count();
+
+        $this->assertDatabaseCount('todo_lists', $todo_list_count);
+        $response->assertStatus(Response::HTTP_NOT_FOUND);
+    }
+
+    public function test_update_todo_list()
+    {
+        $response = $this->patchJson(route('todo-list.update', $this->list->id), [
+            'name' => 'Updated'
+        ]);
+
+        $response->assertStatus(Response::HTTP_OK);
+        $this->assertDatabaseHas('todo_lists', [
+            'id' => $this->list->id,
+            'name' => 'Updated'
+        ]);
+    }
+
+    public function test_todo_list_update_validation()
+    {
+        $this->withExceptionHandling();
+
+        $response = $this->patchJson(route('todo-list.update', $this->list->id))
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+
+        $response->assertJsonValidationErrors('name');
+        $this->assertArrayHasKey('errors', $response->json());
+        $this->assertArrayHasKey('name', $response->json()['errors']);
+    }
 }
