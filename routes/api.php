@@ -37,4 +37,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('todo-list', TodoListController::class);
 
-Route::apiResource('task', TasksController::class)->only('index');
+Route::apiResource('todo-list.task', TasksController::class)
+    ->shallow();
